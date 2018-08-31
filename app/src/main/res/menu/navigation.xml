@@ -19,6 +19,6 @@
     <item
         android:id="@+id/navigation_image"
         android:icon="@drawable/ic_image_black_24dp"
-        android:title="@string/title_image"/>
+        android:title="@string/title_image" />
 
 </menu>

@@ -5,12 +5,14 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -19,7 +21,9 @@ import com.example.sonamserchan.studentmanagementapp.adapter.ListAdapterStudent;
 import com.example.sonamserchan.studentmanagementapp.model.Student;
 import com.example.sonamserchan.studentmanagementapp.repo.StudentRepo;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -81,6 +85,7 @@ public class StudentFragment extends Fragment {
     View rootView;
     CheckBox cbStudent;
     ListAdapterStudent adapter;
+    List<Student> arrayofStudents;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -89,15 +94,29 @@ public class StudentFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_student, container, false);
         //Construct the data source
         studentRepo = new StudentRepo();
-        List<Student> arrayofStudents = studentRepo.getStudents();
-        //Create the adapter to convert the array to views
-        adapter = new ListAdapterStudent(getActivity(), arrayofStudents);
-        //Attach the adapter to a Listview
         listViewStudent = rootView.findViewById(R.id.listViewStudent);
-        listViewStudent.setAdapter(adapter);
+
+        setAdapter();
+
+        listViewStudent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Student item = (Student) adapterView.getItemAtPosition(position);
+                Toast.makeText(getActivity(), String.valueOf(item.getStudentId()), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         //Handle checkbox clicklistener
         return rootView;
+    }
+
+    //adapter for listview
+    public void setAdapter(){
+        arrayofStudents = studentRepo.getStudents();
+        //Create the adapter to convert the array to views
+        adapter = new ListAdapterStudent(getActivity(), arrayofStudents);
+        //Attach the adapter to a Listview
+        listViewStudent.setAdapter(adapter);
     }
 
     @Override
@@ -123,15 +142,22 @@ public class StudentFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private void deleteData(){
-        String studentId = "";
-        boolean[] checkBoxes = adapter.getCheckBoxState();
-        for(int i = 0; i < listViewStudent.getCount(); i++){
-            if(checkBoxes[i] == true){
-                studentId += listViewStudent;
+    private void deleteData() {
+        boolean[] checked = adapter.getCheckBoxState();
+        ArrayList<Student> selectedItems = new ArrayList<>();
+        for (int i = 0; i < checked.length; i++) {
+            if(checked[i]){
+                selectedItems.add(adapter.getItem(i));
             }
         }
-        Toast.makeText(getActivity(), studentId, Toast.LENGTH_SHORT).show();
+        String[] studentId = new String[selectedItems.size()];
+        //trying to get checked student IDs in array of strings
+        for(int i = 0; i < selectedItems.size(); i++){
+            studentId[i] = String.valueOf(adapter.getItem(i).getStudentId());
+        }
+        studentRepo.delete(studentId);
+
+        setAdapter();
     }
 
     // TODO: Rename method, update argument and hook method into UI event

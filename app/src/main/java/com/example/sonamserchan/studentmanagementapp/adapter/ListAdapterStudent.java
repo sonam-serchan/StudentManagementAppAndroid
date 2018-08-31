@@ -1,6 +1,7 @@
 package com.example.sonamserchan.studentmanagementapp.adapter;
 
 import android.content.Context;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,8 @@ public class ListAdapterStudent extends ArrayAdapter<Student> {
 
     //boolean array for storing the state of each checkbox
     boolean[] checkBoxState;
+
+    //SparseBooleanArray selectedStrings ;
 
     public ListAdapterStudent(Context context, List<Student> students) {
         super(context, R.layout.listview_student, students);
@@ -67,9 +70,6 @@ public class ListAdapterStudent extends ArrayAdapter<Student> {
             viewHolder.tvId.setText(String.valueOf(student.getStudentId()));
             viewHolder.tvName.setText(student.getFirstName());
 
-            //setting the state of the checkbox using boolean array
-            viewHolder.cbStudent.setChecked(checkBoxState[position]);
-
             //for managing the state of the boolean array according to the state of the checkbox
             viewHolder.cbStudent.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -90,11 +90,5 @@ public class ListAdapterStudent extends ArrayAdapter<Student> {
     public boolean[]getCheckBoxState(){
         return checkBoxState;
     }
-/*
-
-    public int getStudentId(int id) {
-
-    }
-*/
 
 }

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.ContactsContract;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.example.sonamserchan.studentmanagementapp.database.DatabaseManager;
@@ -78,9 +79,10 @@ public class StudentRepo {
         return studentList;
     }
 
-    public void delete(){
+    public void delete(String[] studentId){
+        String args = TextUtils.join(", ", studentId);
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-        db.delete(Student.TABLE, Student.KEY_StudentId, null);
+        db.delete (Student.TABLE, Student.KEY_StudentId + " IN ("+args+")", null );
         DatabaseManager.getInstance().closeDatabase();
     }
 

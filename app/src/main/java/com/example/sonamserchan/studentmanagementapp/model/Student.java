@@ -1,8 +1,10 @@
 package com.example.sonamserchan.studentmanagementapp.model;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 
-public class Student {
+public class Student implements Serializable{
+
+    private static final long serialVersionUID = 1L;
 
     public static final String TAG = Student.class.getSimpleName();
     public static final String TABLE = "Student";

@@ -101,17 +101,19 @@ public class StudentFragment extends Fragment {
         listViewStudent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Student item = (Student) adapterView.getItemAtPosition(position);
-                Toast.makeText(getActivity(), String.valueOf(item.getStudentId()), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), StudentRecordActivity.class);
+                Student student = (Student) adapterView.getItemAtPosition(position);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("student", student);
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
-
-        //Handle checkbox clicklistener
         return rootView;
     }
 
     //adapter for listview
-    public void setAdapter(){
+    public void setAdapter() {
         arrayofStudents = studentRepo.getStudents();
         //Create the adapter to convert the array to views
         adapter = new ListAdapterStudent(getActivity(), arrayofStudents);
@@ -144,17 +146,21 @@ public class StudentFragment extends Fragment {
 
     private void deleteData() {
         boolean[] checked = adapter.getCheckBoxState();
-        ArrayList<Student> selectedItems = new ArrayList<>();
+        ArrayList<Student> selectedItems = new ArrayList<Student>();
+        //String[] studentId = {};
+        List<String> studentId = new ArrayList<>();
         for (int i = 0; i < checked.length; i++) {
-            if(checked[i]){
+            if (checked[i]) {
                 selectedItems.add(adapter.getItem(i));
+                studentId.add(String.valueOf(adapter.getItem(i).getStudentId()));
             }
         }
-        String[] studentId = new String[selectedItems.size()];
+
+        //String[] studentId = new String[selectedItems.size()];
         //trying to get checked student IDs in array of strings
-        for(int i = 0; i < selectedItems.size(); i++){
+        /*for (int i = 0; i < selectedItems.size(); i++) {
             studentId[i] = String.valueOf(adapter.getItem(i).getStudentId());
-        }
+        }*/
         studentRepo.delete(studentId);
 
         setAdapter();

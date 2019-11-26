@@ -19,13 +19,19 @@ import com.example.sonamserchan.studentmanagementapp.app.App;
 import com.example.sonamserchan.studentmanagementapp.model.Student;
 import com.example.sonamserchan.studentmanagementapp.repo.StudentRepo;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class StudentAddActivity extends AppCompatActivity {
 
     Spinner spinnerCourse, spinnerGender;
     EditText etStudentId, etFirstName, etLastName, etAge, etAddress;
     String spCourse, spGender;
+    ArrayAdapter<CharSequence> adapter;
 
     public static final String TAG = StudentAddActivity.class.getSimpleName();
+    Student editStudent;
+    boolean edit = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +52,7 @@ public class StudentAddActivity extends AppCompatActivity {
         //Spinner for course study
         spinnerCourse = findViewById(R.id.spinnerCourse);
         //create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.entries_course, android.R.layout.simple_spinner_item);
+        adapter = ArrayAdapter.createFromResource(this, R.array.entries_course, android.R.layout.simple_spinner_item);
         //Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //Apply the adapter to the spinner
@@ -55,6 +61,25 @@ public class StudentAddActivity extends AppCompatActivity {
         spinnerCourse.setOnItemSelectedListener(spinnerCourseListener);
         spinnerGender.setOnItemSelectedListener(spinnerGenderListener);
 
+        Bundle bundle = getIntent().getExtras();
+        if(bundle != null) {
+            editStudent = (Student) bundle.getSerializable("student");
+            setEditValues();
+        }
+    }
+
+    public void setEditValues(){
+        etStudentId.setText(String.valueOf(editStudent.getStudentId()));
+        etFirstName.setText(editStudent.getFirstName());
+        etLastName.setText(editStudent.getLastName());
+        int coursePosition = adapter.getPosition(editStudent.getCourseStudy());
+        spinnerCourse.setSelection(coursePosition);
+        ArrayAdapter<CharSequence> genderAdapter = ArrayAdapter.createFromResource(this, R.array.entries_gender, android.R.layout.simple_spinner_item);
+        int genderPosition = genderAdapter.getPosition(editStudent.getGender());
+        spinnerGender.setSelection(genderPosition);
+        etAge.setText(String.valueOf(editStudent.getAge()));
+        etAddress.setText(editStudent.getAddress());
+        edit = true;
     }
 
     AdapterView.OnItemSelectedListener spinnerCourseListener = new AdapterView.OnItemSelectedListener() {
@@ -121,8 +146,14 @@ public class StudentAddActivity extends AppCompatActivity {
         student.setAge(Integer.parseInt(String.valueOf(etAge.getText())));
         student.setAddress(String.valueOf(etAddress.getText()));
         StudentRepo studentRepo = new StudentRepo();
-        studentRepo.insert(student);
-        Toast.makeText(StudentAddActivity.this, String.valueOf("Student with  has been added to the database"), Toast.LENGTH_SHORT).show();
+        if(edit == false){
+            //insert new record
+            studentRepo.insert(student);
+        } else {
+            //update data
+            studentRepo.update(student);
+        }
+        Toast.makeText(StudentAddActivity.this, String.valueOf("A new student has been added to the database"), Toast.LENGTH_SHORT).show();
         clearForm();
     }
 
